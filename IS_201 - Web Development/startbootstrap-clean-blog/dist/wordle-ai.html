@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wordle Clone</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            flex-direction: column;
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(5, 50px);
+            grid-gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tile {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ccc;
+            border-radius: 5px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .correct {
+            background-color: green;
+            color: white;
+        }
+
+        .present {
+            background-color: yellow;
+            color: white;
+        }
+
+        .absent {
+            background-color: gray;
+            color: white;
+        }
+
+        .input-row {
+            display: flex;
+            margin-top: 20px;
+        }
+
+        .input-row input {
+            width: 50px;
+            height: 50px;
+            font-size: 20px;
+            text-align: center;
+            margin: 5px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            background-color: #45a049;
+        }
+
+        .game-info {
+            font-size: 20px;
+            text-align: center;
+        }
+
+    </style>
+</head>
+<body>
+    <div>
+        <span>        
+            <a>Hannah de Gaston </a>|
+            <a href="../dist/index.html">Professional-Looking Pages</a>
+        </span>
+
+
+    </div>
+    <div class="game-info">
+        <h1>Wordle Clone</h1>
+        <p>Guess the 5-letter word in 6 attempts.</p>
+    </div>
+
+    <div class="game-board" id="gameBoard">
+        <!-- Tiles will be dynamically generated here -->
+    </div>
+
+    <div class="input-row">
+        <!-- Input fields for the next guess -->
+        <input type="text" id="input1" maxlength="1" />
+        <input type="text" id="input2" maxlength="1" />
+        <input type="text" id="input3" maxlength="1" />
+        <input type="text" id="input4" maxlength="1" />
+        <input type="text" id="input5" maxlength="1" />
+    </div>
+
+    <button class="btn" id="submitBtn">Submit Guess</button>
+
+    <div class="game-info">
+        <p id="message"></p>
+    </div>
+
+    <script>
+        const words = ['apple', 'grape', 'lemon', 'peach', 'melon'];  // Example words
+        const targetWord = words[Math.floor(Math.random() * words.length)].toUpperCase();  // Random target word
+        let currentRow = 0;  // Track current guess row
+
+        // Create the empty board
+        const gameBoard = document.getElementById("gameBoard");
+        for (let row = 0; row < 6; row++) {
+            for (let col = 0; col < 5; col++) {
+                const tile = document.createElement("div");
+                tile.classList.add("tile");
+                gameBoard.appendChild(tile);
+            }
+        }
+
+        // Handle Guess Submission
+        const submitBtn = document.getElementById("submitBtn");
+        submitBtn.addEventListener("click", submitGuess);
+
+        function submitGuess() {
+            let guess = '';
+            for (let i = 1; i <= 5; i++) {
+                guess += document.getElementById(`input${i}`).value.toUpperCase();
+            }
+
+            if (guess.length < 5 || !/^[A-Z]+$/.test(guess)) {
+                document.getElementById("message").textContent = 'Please enter a valid 5-letter word!';
+                return;
+            }
+
+            // Check the guess
+            checkGuess(guess);
+            currentRow++;
+
+            // Reset input fields for the next guess
+            for (let i = 1; i <= 5; i++) {
+                document.getElementById(`input${i}`).value = '';
+            }
+
+            if (currentRow >= 6) {
+                document.getElementById("message").textContent = `Game Over! The word was: ${targetWord}`;
+                submitBtn.disabled = true;  // Disable the submit button after game over
+            }
+        }
+
+        // Check the guess against the target word
+        function checkGuess(guess) {
+            const rowStartIdx = currentRow * 5;
+            const tiles = gameBoard.children;
+
+            let targetWordCopy = targetWord.split(''); // Copy of the target word
+            let guessCopy = guess.split(''); // Copy of the guess word
+            let yellowCount = {}; // Track yellow-letter occurrences
+
+            // First pass: Check for correct letters in correct positions (Green)
+            for (let i = 0; i < 5; i++) {
+                const tile = tiles[rowStartIdx + i];
+                const letter = guess[i];
+
+                if (letter === targetWord[i]) {
+                    tile.classList.add("correct");
+                    targetWordCopy[i] = null; // Mark letter as used
+                }
+                tile.textContent = letter;
+            }
+
+            // Second pass: Check for letters in the word (Yellow/Gray)
+            for (let i = 0; i < 5; i++) {
+                const tile = tiles[rowStartIdx + i];
+                const letter = guess[i];
+
+                if (targetWordCopy.includes(letter) && targetWordCopy.indexOf(letter) !== -1) {
+                    // If letter is in target word and is not already matched
+                    if (yellowCount[letter]) {
+                        // Letter already counted as yellow, don't mark again
+                        tile.classList.add("absent");
+                    } else {
+                        tile.classList.add("present");
+                        yellowCount[letter] = true; // Mark letter as yellow
+                    }
+
+                    // Remove first matching letter from the copy of the target word
+                    const index = targetWordCopy.indexOf(letter);
+                    targetWordCopy[index] = null;
+                } else {
+                    tile.classList.add("absent");
+                }
+            }
+
+            // Check if the guess is correct
+            if (guess === targetWord) {
+                document.getElementById("message").textContent = "Congratulations! You guessed the word!";
+                submitBtn.disabled = true;
+            }
+        }
+
+        // Restrict inputs to uppercase letters only
+        const inputs = document.querySelectorAll("input[type='text']");
+        inputs.forEach(input => {
+            input.addEventListener("input", function(e) {
+                // Convert input to uppercase and ensure it's a letter
+                e.target.value = e.target.value.toUpperCase().replace(/[^A-Z]/g, '');
+            });
+        });
+    </script>
+
+</body>
+</html>

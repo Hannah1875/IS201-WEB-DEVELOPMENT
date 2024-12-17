@@ -1,0 +1,70 @@
+/* CSS code to change the style and look of all the webpages */
+
+body {
+    font-family: 'Arial', sans-serif;
+    background-color: #f4f4f4;
+    color: #333;
+    margin: 0;
+    padding: 0;
+}
+
+/* Header Styles */
+header {
+    background-color: #003366;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+/* Main Content Section */
+main {
+    padding: 20px;
+}
+
+/* Space Images Section */
+#space-images {
+    background-color: #e6f2ff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.image-container img {
+    width: 300px;
+    margin: 10px;
+    border-radius: 5px;
+}
+
+/* Tableau Container */
+.tableau-container iframe {
+    width: 100%;
+    max-width: 800px;
+    height: 600px;
+    border: none;
+}
+
+/* Navigation and Footer */
+footer {
+    background-color: #003366;
+    color: white;
+    text-align: center;
+    padding: 10px 0;
+}
+
+/* Section Headers */
+h2 {
+    font-family: 'Verdana', sans-serif;
+    color: #003366;
+}
+
+/* Links */
+a {
+    color: #003366;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+a:hover {
+    text-decoration: underline;
+}
+
